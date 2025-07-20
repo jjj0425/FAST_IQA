@@ -1,7 +1,10 @@
 import torch
 import torchvision.models as models
 
-def get_model(model_name, num_classes):
+def get_model(model_name: str, num_classes: int) -> torch.nn.Module:
+    """
+    Returns a torchvision model with the classifier head replaced for the given number of classes.
+    """
     if model_name == "vgg16":
         model = models.vgg16(pretrained=True)
         model.classifier[6] = torch.nn.Linear(4096, num_classes)

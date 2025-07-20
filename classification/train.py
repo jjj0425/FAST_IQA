@@ -9,7 +9,15 @@ import matplotlib.pyplot as plt
 from model import get_model
 from tqdm import tqdm
 
-def train_model(model, dataloaders, criterion, optimizer, num_epochs, device, log_file):
+def train_model(
+    model: torch.nn.Module,
+    dataloaders: dict,
+    criterion: torch.nn.Module,
+    optimizer: torch.optim.Optimizer,
+    num_epochs: int,
+    device: torch.device,
+    log_file: str
+):
     train_loss_history = []
     val_loss_history = []
     train_acc_history = []
@@ -77,9 +85,7 @@ def main():
 
     args = parser.parse_args()
 
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
-
+    os.makedirs(args.output_dir, exist_ok=True)
     log_file = os.path.join(args.output_dir, 'training.log')
 
     data_transforms = {
@@ -95,7 +101,10 @@ def main():
         ]),
     }
 
-    image_datasets = {x: datasets.ImageFolder(os.path.join(args.data_root, x), data_transforms[x]) for x in ['train', 'val']}
+    image_datasets = {
+        x: datasets.ImageFolder(os.path.join(args.data_root, x), data_transforms[x])
+        for x in ['train', 'val']
+    }
     dataloaders = {
         'train': DataLoader(image_datasets['train'], batch_size=args.batch_size, shuffle=True, num_workers=8),
         'val': DataLoader(image_datasets['val'], batch_size=args.batch_size, shuffle=False, num_workers=8)
