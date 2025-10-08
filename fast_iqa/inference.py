@@ -12,6 +12,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
+from .data import DEFAULT_MEAN, DEFAULT_STD
 from .analysis import (
     ClassificationMetrics,
     compute_classification_metrics,
@@ -37,6 +38,8 @@ class InferenceConfig:
     output_dir: Path = Path("runs/inference")
     compute_embeddings: bool = True
     random_state: int = 0
+    normalize_mean: Sequence[float] = DEFAULT_MEAN
+    normalize_std: Sequence[float] = DEFAULT_STD
 
     def resolved_output_dir(self) -> Path:
         path = Path(self.output_dir).expanduser().resolve()
@@ -59,6 +62,7 @@ def _build_dataloader(config: InferenceConfig) -> DataLoader:
         [
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
+            transforms.Normalize(mean=config.normalize_mean, std=config.normalize_std),
         ]
     )
     dataset = datasets.ImageFolder(config.data_root, transform=transform)
